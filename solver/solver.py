@@ -1,6 +1,7 @@
 from collections import deque
 from ..puzzles.puzzle import Value
 from ..database.database import PuzzleDB
+import os
 
 class Solver:
     def __init__(self, puzzle):
@@ -9,13 +10,16 @@ class Solver:
         self.primitives = set()
         self.parent_map = {}
 
-    def solve(self):
+    def solve(self, overwrite=False):
+        db = PuzzleDB('ten-to-zero')
+        if db.open(create=False):
+            return
         self.discover()
         print("discovered")
         self.propagate()
         print("done")
-        db = PuzzleDB('ten-to-zero')
-        db.insert(self.remoteness)
+        db.open()
+        db.insert(self.remoteness, overwrite)
         db.close()
 
     def get_children(self, position):
