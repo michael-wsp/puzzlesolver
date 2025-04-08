@@ -63,7 +63,7 @@ class PuzzleDB:
         Parameters:
             state (int): The (hashed) state of the position.
         
-        Return:
+        Returns:
             Optional[int]: Either the retrieved remoteness, or None if the key does not exist in the database.
         '''
         self.cursor.execute(

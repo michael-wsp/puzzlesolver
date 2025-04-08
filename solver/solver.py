@@ -59,9 +59,8 @@ class Solver:
             rem = self.remoteness.get(position) + 1
             parents = self.parent_map.get(position, set())
             for parent in parents:
-                if rem < self.remoteness.get(parent, float('inf')):
-                    self.remoteness[parent] = rem
                 if parent not in visited:
+                    self.remoteness[parent] = rem
                     visited.add(parent)
                     q.appendleft(parent)
     
