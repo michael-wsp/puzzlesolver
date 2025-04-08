@@ -1,5 +1,6 @@
 from collections import deque
 from ..puzzles.puzzle import Value
+from ..database.database import PuzzleDB
 
 class Solver:
     def __init__(self, puzzle):
@@ -13,6 +14,9 @@ class Solver:
         print("discovered")
         self.propagate()
         print("done")
+        db = PuzzleDB('ten-to-zero')
+        db.insert(self.remoteness)
+        db.close()
 
     def get_children(self, position):
         moves = self.puzzle.generate_moves(position)

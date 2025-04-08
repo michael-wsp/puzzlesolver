@@ -3,7 +3,7 @@ from .puzzle import *
 
 class TenToZero(Puzzle[int]):
     def start(self):
-        return 10000000
+        return 10
     
     def generate_moves(self, position):
         return [x for x in [1, 2] if position - x >= 0]
