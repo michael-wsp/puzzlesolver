@@ -1,6 +1,6 @@
 import sqlite3 as sql
 from pathlib import Path
-import os
+from typing import Optional
 
 class PuzzleDB:
     def __init__(self, id: str):
@@ -29,14 +29,19 @@ class PuzzleDB:
             list(table.items())
         )
     
-    def get(self, state: int):
+    def get(self, state: int) -> Optional[int]:
         self.cursor.execute(
-            f'''
+            '''
             SELECT remoteness FROM puzzledb
             WHERE state = ?
             ''',
             (state,)
         )
+        row = self.cursor.fetchone()
+        if row:
+            return row[0]
+        return None
+        
     
     def close(self):
         self.db.commit()
