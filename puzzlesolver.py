@@ -4,5 +4,5 @@ from .database.database import PuzzleDB
 
 t = TenToZero()
 s = Solver(t)
-s.solve()
+s.solve(overwrite=True)
 s.print()
