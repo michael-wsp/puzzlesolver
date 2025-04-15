@@ -4,9 +4,10 @@ from .puzzle import *
 class TenToZero(Puzzle[int]):
     def __init__(self):
         self.id = 'ten-to-zero'
+        self.n_players = 2
 
     def start(self):
-        return 100
+        return 10
     
     def generate_moves(self, position):
         return [x for x in [1, 2] if position - x >= 0]
@@ -16,6 +17,6 @@ class TenToZero(Puzzle[int]):
     
     def primitive(self, position):
         if position == 0:
-            return Value.Win
+            return Value.Loss
         else:
-            return Value.Undecided
+            return None

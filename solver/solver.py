@@ -3,12 +3,13 @@ from ..puzzles.puzzle import *
 from ..database.database import PuzzleDB
 import os
 
+REMOTENESS_TERMINAL = 0
+
 class Solver:
     def __init__(self, puzzle: Puzzle):
         self.db = PuzzleDB(puzzle.id)
         self.puzzle = puzzle
-        self.remoteness = {}
-        self.primitives = set()
+        self.solution = {}
         self.parent_map = {}
 
     def solve(self, overwrite=False):
@@ -18,7 +19,7 @@ class Solver:
             print("discovered")
             self.propagate()
             print("solved")
-            self.db.insert(self.remoteness)
+            self.db.insert(self.solution)
 
     def get_children(self, position):
         moves = self.puzzle.generate_moves(position)
@@ -33,12 +34,8 @@ class Solver:
         while q:
             position = q.pop()
             value = self.puzzle.primitive(position)
-            if value == Value.Loss:
-                self.remoteness[position] = float('inf')
-                self.primitives.add(position)
-            elif value == Value.Win:
-                self.remoteness[position] = 0
-                self.primitives.add(position)
+            if value is not None:
+                self.solution[position] = (REMOTENESS_TERMINAL, value)
             else:
                 children = self.get_children(position)
                 for child in children:
@@ -50,29 +47,44 @@ class Solver:
                         q.appendleft(child)
     
     def propagate(self):
-        visited = set(self.primitives)
-        q = deque(self.primitives)
+        q = deque(self.solution.keys())
         while q:
             position = q.pop()
-            rem = self.remoteness.get(position) + 1
+            parent_rem, val = self.solution.get(position)
+            parent_rem += 1
+            parent_val = self.parent_value(val)
             parents = self.parent_map.get(position, set())
             for parent in parents:
-                if parent not in visited:
-                    self.remoteness[parent] = rem
-                    visited.add(parent)
+                parent_sol = self.solution.get(parent)
+                if not parent_sol:
+                    self.solution[parent] = (parent_rem, parent_val)
                     q.appendleft(parent)
+                elif parent_sol[1] < parent_val:
+                    self.solution[parent] = (parent_rem, parent_val)
+
+    
+    def parent_value(self, val: Value) -> Value:
+        if self.puzzle.n_players == 1:
+            return val
+        else:
+            if val == Value.Win:
+                return Value.Loss
+            elif val == Value.Loss:
+                return Value.Win
+            else:
+                return val
     
     def print(self):
-        if self.remoteness:
-            rem_map = self.remoteness.items()
+        if self.solution:
+            sol = [(position, rem, value) for position, (rem, value) in self.solution.items()]
         else:
-            rem_map = self.db.get_all()
-        for (position, rem) in rem_map:
-            print(f'{position} : remoteness : {rem}')
+            sol = self.db.get_all()
+        for (position, rem, value) in sol:
+            print(f'{position} : remoteness : {rem} : value : {value}')
                 
     
     def get_remoteness(self, state: int) -> int:
-        rem = self.db.get(state)
+        rem, _ = self.db.get(state)
         if rem is None:
             return -1
         return rem

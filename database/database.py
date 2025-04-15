@@ -73,7 +73,7 @@ class PuzzleDB:
         return self.cursor.fetchone()
         
     
-    def get_all(self) -> list[tuple[int, int]]:
+    def get_all(self) -> list[tuple[int, int, int]]:
         self.cursor.execute('SELECT * FROM puzzledb')
         return self.cursor.fetchall()
 

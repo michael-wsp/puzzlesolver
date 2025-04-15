@@ -1,14 +1,14 @@
 from abc import ABC, abstractmethod
-from typing import TypeVar, Generic
+from typing import TypeVar, Generic, Optional
 from collections.abc import Hashable
-from enum import Enum
+from enum import IntEnum
 
 State = TypeVar('state', bound=Hashable)
 
-class Value(Enum):
-    Undecided = 0
-    Win = 1
-    Loss = 2
+class Value(IntEnum):
+    Loss = 0
+    Tie = 1
+    Win = 2
 
 
 class Puzzle(ABC, Generic[State]):
@@ -38,7 +38,7 @@ class Puzzle(ABC, Generic[State]):
         pass
 
     @abstractmethod
-    def primitive(self, position: State) -> Value:
+    def primitive(self, position: State) -> Optional[Value]:
         """
         Returns a Value enum which defines whether the current position is a win, loss, or non-terminal. 
         """
