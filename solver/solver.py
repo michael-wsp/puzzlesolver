@@ -1,7 +1,6 @@
 from collections import deque
 from ..puzzles.puzzle import *
 from ..database.database import PuzzleDB
-import os
 
 REMOTENESS_TERMINAL = 0
 
@@ -80,8 +79,7 @@ class Solver:
         else:
             sol = self.db.get_all()
         for (position, rem, value) in sol:
-            print(f'{position} : remoteness : {rem} : value : {value}')
-                
+            print(f'state: {position} | remoteness: {rem} | value: {Value(value).name}')
     
     def get_remoteness(self, state: int) -> int:
         rem, _ = self.db.get(state)
