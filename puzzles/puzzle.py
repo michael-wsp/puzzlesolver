@@ -13,6 +13,10 @@ class Value(Enum):
 
 class Puzzle(ABC, Generic[State]):
     @abstractmethod
+    def __init__(self):
+        pass
+
+    @abstractmethod
     def start(self) -> State:
         """
         Returns the starting position of the puzzle.

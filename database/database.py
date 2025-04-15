@@ -6,8 +6,10 @@ import os
 class PuzzleDB:
     def __init__(self, id: str):
         self.path = f'{Path(__file__).parent}/db/{id}.db'
+        self.db = sql.connect(self.path)
+        self.cursor = self.db.cursor()
 
-    def open(self, create=True) -> bool:
+    def create(self, overwrite=True) -> bool:
         '''
         Attempts to open the db file.
         
@@ -20,23 +22,21 @@ class PuzzleDB:
         Returns:
             bool: Whether or not the file was successfully opened.
         '''
-        if not create:
-            if not os.path.exists(self.path):
-                return False
-            return True
-        self.db = sql.connect(self.path)
-        self.cursor = self.db.cursor()
+        if overwrite:
+            self.cursor.execute('DROP TABLE IF EXISTS puzzledb')
+            self.db.commit()
         self.cursor.execute(
             '''
             CREATE TABLE IF NOT EXISTS puzzledb (
                 state INTEGER PRIMARY KEY,
-                remoteness INTEGER
+                remoteness INTEGER,
+                value INTEGER
             )
             '''
         )
         return True
     
-    def insert(self, table: dict[int, int], overwrite=False):
+    def insert(self, table: dict[int, tuple[int, int]]):
         '''
         Attempts to insert the key, value pairs in the given dictionary into the database.
 
@@ -44,19 +44,16 @@ class PuzzleDB:
             table (dict): The dictionary of values to insert.
             overwrite (bool, optional): Whether the database entries should be overwritten. Defaults to False.
         '''
-        if overwrite:
-            mod = 'REPLACE'
-        else:
-            mod = 'IGNORE'
         self.cursor.executemany(
-            f'''
-            INSERT OR {mod} INTO puzzledb (state, remoteness)
-            VALUES (?, ?)
+            '''
+            INSERT OR IGNORE INTO puzzledb (state, remoteness, value)
+            VALUES (?, ?, ?)
             ''',
-            list(table.items())
+            [(state, remoteness, value) for state, (remoteness, value) in table.items()]
         )
+        self.db.commit()
     
-    def get(self, state: int) -> Optional[int]:
+    def get(self, state: int) -> Optional[tuple[int, int]]:
         '''
         Attempts to retrieve the remoteness for the given state from the database.
 
@@ -64,19 +61,22 @@ class PuzzleDB:
             state (int): The (hashed) state of the position.
         
         Returns:
-            Optional[int]: Either the retrieved remoteness, or None if the key does not exist in the database.
+            Optional[tuple[int, int]]: Either the retrieved remoteness, or None if the key does not exist in the database.
         '''
         self.cursor.execute(
             '''
-            SELECT remoteness FROM puzzledb
+            SELECT remoteness, value FROM puzzledb
             WHERE state = ?
             ''',
             (state,)
         )
-        row = self.cursor.fetchone()
-        if row:
-            return row[0]
-        return None
+        return self.cursor.fetchone()
+        
+    
+    def get_all(self) -> list[tuple[int, int]]:
+        self.cursor.execute('SELECT * FROM puzzledb')
+        return self.cursor.fetchall()
+
         
     
     def close(self):

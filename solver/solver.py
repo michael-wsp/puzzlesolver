@@ -1,26 +1,24 @@
 from collections import deque
-from ..puzzles.puzzle import Value
+from ..puzzles.puzzle import *
 from ..database.database import PuzzleDB
 import os
 
 class Solver:
-    def __init__(self, puzzle):
+    def __init__(self, puzzle: Puzzle):
+        self.db = PuzzleDB(puzzle.id)
         self.puzzle = puzzle
         self.remoteness = {}
         self.primitives = set()
         self.parent_map = {}
 
     def solve(self, overwrite=False):
-        db = PuzzleDB('ten-to-zero')
-        if db.open(create=False):
-            return
-        self.discover()
-        print("discovered")
-        self.propagate()
-        print("done")
-        db.open()
-        db.insert(self.remoteness, overwrite)
-        db.close()
+        self.db.create(overwrite)
+        if overwrite:
+            self.discover()
+            print("discovered")
+            self.propagate()
+            print("solved")
+            self.db.insert(self.remoteness)
 
     def get_children(self, position):
         moves = self.puzzle.generate_moves(position)
@@ -65,5 +63,16 @@ class Solver:
                     q.appendleft(parent)
     
     def print(self):
-        for position, rem in self.remoteness.items():
+        if self.remoteness:
+            rem_map = self.remoteness.items()
+        else:
+            rem_map = self.db.get_all()
+        for (position, rem) in rem_map:
             print(f'{position} : remoteness : {rem}')
+                
+    
+    def get_remoteness(self, state: int) -> int:
+        rem = self.db.get(state)
+        if rem is None:
+            return -1
+        return rem

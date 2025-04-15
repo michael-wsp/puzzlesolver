@@ -1,6 +1,9 @@
 from puzzle import *
 
 class Example(Puzzle[int]):
+    def __init__(self):
+        self.id = 'example'
+
     def start(self) -> int:
         """
         Returns the starting position of the puzzle.

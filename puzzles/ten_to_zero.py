@@ -2,8 +2,11 @@ from .puzzle import *
 
 
 class TenToZero(Puzzle[int]):
+    def __init__(self):
+        self.id = 'ten-to-zero'
+
     def start(self):
-        return 1000000
+        return 100
     
     def generate_moves(self, position):
         return [x for x in [1, 2] if position - x >= 0]
