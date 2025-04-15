@@ -11,7 +11,7 @@ class Value(IntEnum):
     Win = 2
 
 
-class Puzzle(ABC, Generic[State]):
+class Game(ABC, Generic[State]):
     @abstractmethod
     def __init__(self):
         pass

@@ -1,0 +1,1 @@
+Sqlite will create its game db files in this directory.

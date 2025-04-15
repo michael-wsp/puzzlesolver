@@ -1,7 +1,7 @@
-from .puzzle import *
+from .game import *
 
 
-class TenToZero(Puzzle[int]):
+class TenToZero(Game[int]):
     def __init__(self):
         self.id = 'ten-to-zero'
         self.n_players = 2

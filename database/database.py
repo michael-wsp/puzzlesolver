@@ -1,9 +1,8 @@
 import sqlite3 as sql
 from pathlib import Path
 from typing import Optional
-import os
 
-class PuzzleDB:
+class GameDB:
     def __init__(self, id: str):
         self.path = f'{Path(__file__).parent}/db/{id}.db'
         self.db = sql.connect(self.path)
@@ -23,11 +22,11 @@ class PuzzleDB:
             bool: Whether or not the file was successfully opened.
         '''
         if overwrite:
-            self.cursor.execute('DROP TABLE IF EXISTS puzzledb')
+            self.cursor.execute('DROP TABLE IF EXISTS gamedb')
             self.db.commit()
         self.cursor.execute(
             '''
-            CREATE TABLE IF NOT EXISTS puzzledb (
+            CREATE TABLE IF NOT EXISTS gamedb (
                 state INTEGER PRIMARY KEY,
                 remoteness INTEGER,
                 value INTEGER
@@ -46,7 +45,7 @@ class PuzzleDB:
         '''
         self.cursor.executemany(
             '''
-            INSERT OR IGNORE INTO puzzledb (state, remoteness, value)
+            INSERT OR IGNORE INTO gamedb (state, remoteness, value)
             VALUES (?, ?, ?)
             ''',
             [(state, remoteness, value) for state, (remoteness, value) in table.items()]
@@ -65,7 +64,7 @@ class PuzzleDB:
         '''
         self.cursor.execute(
             '''
-            SELECT remoteness, value FROM puzzledb
+            SELECT remoteness, value FROM gamedb
             WHERE state = ?
             ''',
             (state,)
@@ -74,7 +73,7 @@ class PuzzleDB:
         
     
     def get_all(self) -> list[tuple[int, int, int]]:
-        self.cursor.execute('SELECT * FROM puzzledb')
+        self.cursor.execute('SELECT * FROM gamedb')
         return self.cursor.fetchall()
 
         

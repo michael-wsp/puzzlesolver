@@ -1,8 +1,9 @@
-from puzzle import *
+from game import *
 
-class Example(Puzzle[int]):
+class Example(Game[int]):
     def __init__(self):
         self.id = 'example'
+        self.n_players = 1
 
     def start(self) -> int:
         """

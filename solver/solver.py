@@ -1,13 +1,13 @@
 from collections import deque
-from ..puzzles.puzzle import *
-from ..database.database import PuzzleDB
+from ..games.game import *
+from ..database.database import GameDB
 
 REMOTENESS_TERMINAL = 0
 
 class Solver:
-    def __init__(self, puzzle: Puzzle):
-        self.db = PuzzleDB(puzzle.id)
-        self.puzzle = puzzle
+    def __init__(self, game: Game):
+        self.db = GameDB(game.id)
+        self.game = game
         self.solution = {}
         self.parent_map = {}
 
@@ -21,18 +21,18 @@ class Solver:
             self.db.insert(self.solution)
 
     def get_children(self, position):
-        moves = self.puzzle.generate_moves(position)
-        return map(lambda m: self.puzzle.do_move(position, m), moves)
+        moves = self.game.generate_moves(position)
+        return map(lambda m: self.game.do_move(position, m), moves)
 
     def discover(self):
         visited = set()
         q = deque()
-        start = self.puzzle.start()
+        start = self.game.start()
         q.appendleft(start)
         visited.add(start)
         while q:
             position = q.pop()
-            value = self.puzzle.primitive(position)
+            value = self.game.primitive(position)
             if value is not None:
                 self.solution[position] = (REMOTENESS_TERMINAL, value)
             else:
@@ -63,7 +63,7 @@ class Solver:
 
     
     def parent_value(self, val: Value) -> Value:
-        if self.puzzle.n_players == 1:
+        if self.game.n_players == 1:
             return val
         else:
             if val == Value.Win:

@@ -1,6 +1,5 @@
 from .solver.solver import Solver
-from .puzzles.ten_to_zero import TenToZero
-from .database.database import PuzzleDB
+from .games.ten_to_zero import TenToZero
 
 t = TenToZero()
 s = Solver(t)
