@@ -6,16 +6,16 @@ class TenToZero(Game[int]):
         self.id = 'ten-to-zero'
         self.n_players = 2
 
-    def start(self):
+    def start(self) -> int:
         return 10
     
-    def generate_moves(self, position):
+    def generate_moves(self, position: int) -> list[int]:
         return [x for x in [1, 2] if position - x >= 0]
     
-    def do_move(self, position, move):
+    def do_move(self, position: int, move: int) -> int:
         return position - move
     
-    def primitive(self, position):
+    def primitive(self, position) -> Optional[Value]:
         if position == 0:
             return Value.Loss
         else:

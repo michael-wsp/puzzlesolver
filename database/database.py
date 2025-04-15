@@ -1,14 +1,16 @@
 import sqlite3 as sql
 from pathlib import Path
 from typing import Optional
+import os
 
 class GameDB:
     def __init__(self, id: str):
         self.path = f'{Path(__file__).parent}/db/{id}.db'
+        self.exists = os.path.exists(self.path)
         self.db = sql.connect(self.path)
         self.cursor = self.db.cursor()
 
-    def create(self, overwrite=True) -> bool:
+    def create_table(self, overwrite=True):
         '''
         Attempts to open the db file.
         
@@ -33,7 +35,6 @@ class GameDB:
             )
             '''
         )
-        return True
     
     def insert(self, table: dict[int, tuple[int, int]]):
         '''

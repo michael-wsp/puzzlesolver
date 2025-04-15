@@ -6,14 +6,14 @@ REMOTENESS_TERMINAL = 0
 
 class Solver:
     def __init__(self, game: Game):
-        self.db = GameDB(game.id)
         self.game = game
         self.solution = {}
         self.parent_map = {}
 
     def solve(self, overwrite=False):
-        self.db.create(overwrite)
-        if overwrite:
+        self.db = GameDB(self.game.id)
+        if overwrite or not self.db.exists:
+            self.db.create_table(overwrite)
             self.discover()
             print("discovered")
             self.propagate()
@@ -55,7 +55,7 @@ class Solver:
             parents = self.parent_map.get(position, set())
             for parent in parents:
                 parent_sol = self.solution.get(parent)
-                if not parent_sol:
+                if parent_sol is not None:
                     self.solution[parent] = (parent_rem, parent_val)
                     q.appendleft(parent)
                 elif parent_sol[1] < parent_val:
