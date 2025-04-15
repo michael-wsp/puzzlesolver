@@ -55,7 +55,7 @@ class Solver:
             parents = self.parent_map.get(position, set())
             for parent in parents:
                 parent_sol = self.solution.get(parent)
-                if parent_sol is not None:
+                if parent_sol is None:
                     self.solution[parent] = (parent_rem, parent_val)
                     q.appendleft(parent)
                 elif parent_sol[1] < parent_val:
